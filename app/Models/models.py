@@ -10,9 +10,9 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    username = Column(String, Unique=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-    contact = relationship('Contact', back_populates='user')
+    '''contact = relationship('Contact', back_populates='user')'''
 
 session = sessionmaker(bind=Engine)
 
