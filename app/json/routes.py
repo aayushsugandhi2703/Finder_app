@@ -10,6 +10,7 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["5 per minute"])
 
 json_bp = Blueprint('json', __name__)
 
+
 @json_bp.route('/login', methods=['GET', 'POST'])
 def login():
     data = request.get_json()
