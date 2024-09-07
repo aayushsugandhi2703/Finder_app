@@ -1,16 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from werkzeug.security import generate_password_hash
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Length
 
 class LoginForm(FlaskForm):
-    Username= StringField('username', validators=[DataRequired(), Length(min = 2, max = 20)])
-    Password = PasswordField('passowrd', validators=[DataRequired(), Length(min = 8, max = 20)])
-    Remember = BooleanField('Remember Me')
-    Submit = SubmitField('Login')
+    username= StringField('username', validators=[DataRequired(), Length(min = 2, max = 20)])
+    password = PasswordField('passowrd', validators=[DataRequired(), Length(min = 8, max = 20)])
+    submit = SubmitField('Login')
 
 class RegisterForm(FlaskForm):
-    Username= StringField('username', validators=[DataRequired(), Length(min = 2, max = 20)])
-    Password = PasswordField('passowrd', validators=[DataRequired(), Length(min = 8, max = 20)])
-    ConfirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('Password')])
-    Submit = SubmitField('Register')
+    username= StringField('username', validators=[DataRequired(), Length(min = 2, max = 20)])
+    password = PasswordField('passowrd', validators=[DataRequired(), Length(min = 8, max = 20)])
+    submit = SubmitField('Register')
