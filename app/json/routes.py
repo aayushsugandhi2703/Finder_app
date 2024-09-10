@@ -13,15 +13,19 @@ json_bp = Blueprint('json', __name__)
 
 @json_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    user = Session.query(User).filter_by(username=username).first()
-    if user and check_password_hash(user.password, password):
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
-        current_app.logger.info(f"User {username} logged in successfully")
-    else:
-        current_app.logger.error(f"User {username} failed to login")
-    return jsonify(access_token=access_token, refresh_token=refresh_token)
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
 
+        user = Session.query(User).filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
+            current_app.logger.info(f"User {username} logged in successfully")
+            return jsonify(access_token=access_token, refresh_token=refresh_token, username=username, id=user.id,password=user.password) 
+        else:
+            current_app.logger.error(f"User {username} failed to login")
+            flash('Invalid username or password')
+    
+    return render_template('Login.html', form=form)
