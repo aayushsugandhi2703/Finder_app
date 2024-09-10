@@ -66,8 +66,8 @@ def Register():
 def Logout():
 
     response = make_response(redirect(url_for('api.Login')))
-    response.delete_cookie('access_token_cookie')  # Ensure you delete the correct cookie
-    response.delete_cookie('refresh_token_cookie')  # Also delete the refresh token
+    response.delete_cookie('access_token_cookie')  
+    response.delete_cookie('refresh_token_cookie') 
     logout_user()
     session.clear()
     return response
