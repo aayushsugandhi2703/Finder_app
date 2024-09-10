@@ -1,7 +1,7 @@
-from flask import Flask, Blueprint, render_template, redirect, url_for, flash, jsonify, make_response, session
+from flask import Flask, Blueprint, render_template, redirect, url_for, flash, jsonify, make_response, session, current_app 
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity    
-from app.Models.models import User, Session
-from app.Forms.forms import LoginForm, RegisterForm
+from app.Models.models import User, Session, Contact
+from app.Forms.forms import LoginForm, RegisterForm, ContactForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -22,24 +22,24 @@ def index():
 def Login():
     form = LoginForm()
 
-    # If the form is submitted and validated, the user will be redirected to the task page
-    if form.validate_on_submit(): 
+    if form.validate_on_submit():
         user = Session.query(User).filter_by(username=form.username.data).first()
-        if user and user.password == check_password_hash(user.password, form.password.data):
+        if user and check_password_hash(user.password, form.password.data):
             session['user_id'] = user.id
+            login_user(user)
 
-            # Create the access and refresh tokens
             access_token = create_access_token(identity=user.id)
             refresh_token = create_refresh_token(identity=user.id)
 
-            response = make_response(redirect(url_for('api.login')))
+            response = make_response(redirect(url_for('api.Add')))  
             response.set_cookie('access_token_cookie', access_token, httponly=True)
             response.set_cookie('refresh_token_cookie', refresh_token, httponly=True)
-            login_user(user)
 
             return response 
-      # return jsonify(access_token=access_token, refresh_token=refresh_token)
+        else:
+            flash('Invalid username or password')
     return render_template('Login.html', form=form)
+
 
 # This function and route is for the user to register
 @api_bp.route('/register', methods=['GET', 'POST'])
@@ -71,4 +71,20 @@ def Logout():
     logout_user()
     session.clear()
     return response
+
+@api_bp.route('/add', methods=['GET', 'POST'])
+@login_required
+@limiter.limit("10 per minute")
+def Add():
+    form = ContactForm()
+    if form.validate_on_submit():
+        contact = Contact(name=form.name.data, phone=form.phone.data, user_id=session['user_id'])
+        Session.add(contact)  
+        Session.commit()   
+        flash('Contact added successfully', 'success')
+        return redirect(url_for('api.Add'))
+    else:
+        Session.rollback() 
+        flash('Failed to add contact', 'danger')        
+    return render_template('Add.html', form=form)
 
