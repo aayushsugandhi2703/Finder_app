@@ -5,10 +5,14 @@ from app.Forms.forms import LoginForm, RegisterForm, ContactForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import logging
+from logging.handlers import RotatingFileHandler
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["5 per minute"])
 
 json_bp = Blueprint('json', __name__)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', filename='app.log')
 
 
 @json_bp.route('/login', methods=['GET', 'POST'])
@@ -20,24 +24,30 @@ def login():
 
         user = Session.query(User).filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
+            current_app.logger.info(f"User {username} logged in successfully")
+
             access_token = create_access_token(identity=user.id)
             refresh_token = create_refresh_token(identity=user.id)
-            current_app.logger.info(f"User {username} logged in successfully")
-            return jsonify(access_token=access_token, refresh_token=refresh_token, username=username, id=user.id,password=user.password) 
+
+            response = make_response(redirect(url_for('json.add')))
+            response.set_cookie('access_token_cookie', access_token, httponly=True)
+            response.set_cookie('refresh_token_cookie', refresh_token, httponly=True)
+            return response
         else:
             current_app.logger.error(f"User {username} failed to login")
             flash('Invalid username or password')
     
     return render_template('Login.html', form=form)
 
-@json_bp.route('/add', methods=['GET', 'POST'])
+@json_bp.route('/adds', methods=['GET', 'POST'])
+@jwt_required()
 def add():
     form = ContactForm()
     if form.validate_on_submit():
         name = form.name.data
         phone = form.phone.data
         user_id = get_jwt_identity()
-        contact = Contact(name=name, phone=phone, user_id=user_id)
+        contact = Contact(name=name, phone=phone)
         Session.add(contact)
         Session.commit()
         current_app.logger.info(f"User {user_id} added a contact")

@@ -27,7 +27,7 @@ def is_anonymous(self):
 def is_authenticated(self):
     return True
 
-class Contact(Base):
+class Contact(UserMixin, Base):
     __tablename__ = 'contacts'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)

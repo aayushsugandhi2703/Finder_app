@@ -22,7 +22,7 @@
         {% endwith %}
 
         <!-- Contact form -->
-        <form method="POST" action="Add">
+        <form method="POST" action="adds">
             {{ form.hidden_tag() }}
 
             <div class="form-group">
@@ -48,8 +48,9 @@
                     </div>
                 {% endif %}
             </div>
-
-            <button type="submit" class="btn btn-primary">Add Contact</button>
+            <div>
+                {{ form.submit }}
+            </div>
         </form>
     </div>
 </body>

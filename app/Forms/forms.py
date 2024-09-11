@@ -14,5 +14,5 @@ class RegisterForm(FlaskForm):
 
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
-    phone = IntegerField('Phone', validators=[DataRequired(), Length(min=10, max=10)])
+    phone = IntegerField('Phone', validators=[DataRequired()])
     submit = SubmitField('Add Contact')

@@ -23,10 +23,6 @@ def create_app():
     login_manager.login_view = 'api.Login'
     login_manager.init_app(app)
 
-    login_manager = LoginManager()
-    login_manager.login_view = 'api.Login'
-    login_manager.init_app(app)
-
     @login_manager.user_loader
     def load_user(user_id):
         return Session.query(User).get(int(user_id))
@@ -36,7 +32,7 @@ def create_app():
     limiter.init_app(app)
     
 #configurint the logger
-    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+    '''handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
 
     handler.setLevel(logging.INFO)
 
@@ -44,7 +40,7 @@ def create_app():
 
     handler.setFormatter(formatter)
 
-    app.logger.addHandler(handler)
+    app.logger.addHandler(handler)'''
 
 #import the blueprints
     from app.api.routes import api_bp

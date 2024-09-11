@@ -31,7 +31,7 @@ def Login():
             access_token = create_access_token(identity=user.id)
             refresh_token = create_refresh_token(identity=user.id)
 
-            response = make_response(redirect(url_for('api.Add')))  
+            response = make_response(redirect(url_for('api.adds')))  
             response.set_cookie('access_token_cookie', access_token, httponly=True)
             response.set_cookie('refresh_token_cookie', refresh_token, httponly=True)
 
@@ -72,17 +72,23 @@ def Logout():
     session.clear()
     return response
 
-@api_bp.route('/add', methods=['GET', 'POST'])
+@api_bp.route('/adds', methods=['GET', 'POST'])
 @login_required
 @limiter.limit("10 per minute")
-def Add():
+def adds():
     form = ContactForm()
     if form.validate_on_submit():
-        contact = Contact(name=form.name.data, phone=form.phone.data, user_id=session['user_id'])
-        Session.add(contact)  
-        Session.commit()   
-        flash('Contact added successfully', 'success')
-        return redirect(url_for('api.Add'))
+        try:
+            user_id = session.get('user_id')
+            contact = Contact(name=form.name.data, phone=form.phone.data, user_id=user_id)
+            Session.add(contact)  
+            Session.commit()   
+            flash('Contact added successfully', 'success')
+            return redirect(url_for('api.adds'))
+        except:
+            Session.rollback()
+            flash('Failed to add contact', 'danger')
+            return redirect(url_for('api.Login'))
     else:
         Session.rollback() 
         flash('Failed to add contact', 'danger')        
