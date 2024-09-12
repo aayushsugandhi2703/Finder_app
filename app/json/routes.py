@@ -5,14 +5,10 @@ from app.Forms.forms import LoginForm, RegisterForm, ContactForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import logging
-from logging.handlers import RotatingFileHandler
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["5 per minute"])
 
 json_bp = Blueprint('json', __name__)
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', filename='app.log')
 
 
 @json_bp.route('/login', methods=['GET', 'POST'])
