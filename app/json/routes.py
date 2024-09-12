@@ -1,8 +1,8 @@
-from flask import Flask, Blueprint, render_template, redirect, url_for, flash, jsonify, make_response, current_app,request
-from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity    
+from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, make_response, current_app
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity    
 from app.Models.models import User, Session, Contact
-from app.Forms.forms import LoginForm, RegisterForm, ContactForm
-from werkzeug.security import generate_password_hash, check_password_hash
+from app.Forms.forms import LoginForm, ContactForm
+from werkzeug.security import check_password_hash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
