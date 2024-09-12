@@ -6,6 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask_login import LoginManager
 from app.Models.models import User, Session
+import os
 
 jwt = JWTManager()
 def create_app():
@@ -23,10 +24,6 @@ def create_app():
     login_manager.login_view = 'api.Login'
     login_manager.init_app(app)
 
-    login_manager = LoginManager()
-    login_manager.login_view = 'api.Login'
-    login_manager.init_app(app)
-
     @login_manager.user_loader
     def load_user(user_id):
         return Session.query(User).get(int(user_id))
@@ -36,15 +33,20 @@ def create_app():
     limiter.init_app(app)
     
 #configurint the logger
-    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+    def setup_logger(logger):
+        if not app.debug and not app.testing:
+            if not os.path.exists('logs'):
+                os.mkdir('logs')
+        file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
 
-    handler.setLevel(logging.INFO)
+        app.logger.setLevel(logging.INFO)
+        app.logger.info('App startup')
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    handler.setFormatter(formatter)
-
-    app.logger.addHandler(handler)
+    setup_logger(app.logger)
 
 #import the blueprints
     from app.api.routes import api_bp
