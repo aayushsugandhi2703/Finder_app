@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 from flask_login import LoginManager
 from app.Models.models import User, Session
 import os
+from flask_caching import Cache
 
 jwt = JWTManager()
 def create_app():
@@ -28,9 +29,13 @@ def create_app():
     def load_user(user_id):
         return Session.query(User).get(int(user_id))
     
-#initializing hte limiter
+#initializing the limiter
     limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
     limiter.init_app(app)
+
+#initializing the cache
+    cache = Cache(app)
+    cache.init_app(app)
     
 #configurint the logger
     def setup_logger(logger):
