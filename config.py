@@ -18,3 +18,11 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = True
     JWT_ACCESS_TOKEN_EXPIRES = 100
     JWT_REFRESH_TOKEN_EXPIRES = 100
+
+#for cache
+    CACHE_TYPE = 'redis'
+    CACHE_REDIS_HOST = 'localhost'
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_DB = 0
+    CACHE_REDIS_PASSWORD = None
+    CACHE_REDIS_URL = 'redis://localhost:6379/0'

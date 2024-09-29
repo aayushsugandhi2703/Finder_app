@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_login import login_user, logout_user, login_required
+from app import cache
 
 api_bp = Blueprint('api', __name__)
 
@@ -18,6 +19,7 @@ def index():
 
 # This function and route is for the user to login 
 @api_bp.route('/login', methods=['GET', 'POST'])
+
 @limiter.limit("5 per minute")
 def Login():
     form = LoginForm()
@@ -43,6 +45,7 @@ def Login():
 
 # This function and route is for the user to register
 @api_bp.route('/register', methods=['GET', 'POST'])
+@cache.cached(timeout=50)
 @limiter.limit("5 per minute")
 def Register():
     form = RegisterForm()
